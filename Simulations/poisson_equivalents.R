@@ -1,6 +1,6 @@
 library(dplyr)
 
-n <- 100000
+n <- 10000
 x1 <- rbinom(n, 1, 0.2)
 x2 <- rbinom(n, 1, 0.4)
 x3 <- rbinom(n, 1, 0.6)
@@ -26,7 +26,9 @@ new_data$ybar <- with(new_data, y/offset)
 target <- glm(y ~ x1 + x2 + x3 + x4 + w1 + w2, data = data, family = quasipoisson(link = "log"))            
 test1 <- glm(y ~ x1 + x2 + x3 + x4 + w1 + w2, offset = log(offset), data = new_data, family = quasipoisson(link = "log"))  
 test2 <- glm(ybar ~ x1 + x2 + x3 + x4 + w1 + w2, weights = offset, data = new_data, family = quasipoisson(link = "log"))  
+test3 <- glm(ybar ~ x1 + x2 + x3 + x4 + w1 + w2, data = new_data, family = quasipoisson(link = "log")) 
 
-summary(target)
-summary(test1)
-summary(test2)
+summary(target) # what we estimate
+summary(test1) # with an offset
+summary(test2) # with weights parameterized by rate
+summary(test3) # rate without weights

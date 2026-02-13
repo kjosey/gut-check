@@ -11,13 +11,13 @@ library(MCPanel)
 # base data
 set.seed(42) # this makes the simulation exactly reproducible
 n = 700 # number of persons
-m = 6 # observation periods
+m = 2 # observation periods
 prob = 0.7 # 1 - attrition rate
 
 # fixed effects
 hosp.b = c(-0.025, -0.05, -0.075, -0.1, -0.125)  # decrease over time for VA = 5% decrease
 mi.b = seq(0.0005, 0.004, by = 0.0005) # 1 unit increase in MI increases burnout by 100*0.XX%
-er.b = seq(0.02, 0.09, by = 0.01) # 1 unit increase in RE increases burnout by 100*0.XX%
+er.b = seq(0.02, 0.11, by = 0.01) # 1 unit increase in RE increases burnout by 100*0.XX%
 
 did2_pwr <- function(n, m, beta, gamma, exposure = c("mi", "er")) {
 

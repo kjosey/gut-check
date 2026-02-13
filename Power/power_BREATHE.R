@@ -22,7 +22,7 @@ sig2.seq <- seq(0.01, 1, by = 0.01) # sequence of possible overdispersions
 
 # calculate icc
 # icc.seq <- c(0, 0.05, 0.1, 0.15, 0.2)
-icc.seq <- c(0.05, 0.1)
+icc.seq <- c(0, 0.025, 0.05, 0.075, 0.1)
 icc.sig2.seq <- sapply(sig2.seq, function(z, ...) {
   iccCounts:::r_Pois(log(p0), log(sqrt(z)))
 })

@@ -1,6 +1,6 @@
 library(clusterPower)
 library(swdpwr)
-library(geepack)
+library(lme4)
 library(dplyr)
 
 # data dimensions
@@ -20,7 +20,7 @@ covars <- data.frame(pcp = pcp, treat = treat, site = site)
 # parameters
 p0 <- 0.25
 p1 <- 0.31
-icc <- 0.0
+icc <- 0.05
 
 beta <- c(qlogis(p0), qlogis(p1) - qlogis(p0),
           rnorm(l - 1, 0, 0.5)) # random effects for site modeled as fixed effects
@@ -35,7 +35,7 @@ icc_seq <- sapply(sig2_seq, function(z, ...) {
 sig2 <- sig2_seq[which.min(abs(icc_seq - icc))]
 
 # GEE simulation
-test_gee <- vector(mode = "numeric", length = n.iter)
+test_glmm <- vector(mode = "numeric", length = n.iter)
 
 for (i in 1:n.iter) {
   
@@ -47,14 +47,13 @@ for (i in 1:n.iter) {
   mu <- plogis(alpha[pcp] + c(X %*% beta))
   y <- rbinom(nrow(X), size = 1, prob = mu)
   
-  fit <- geeglm(y ~ treat + site, family = binomial(link = "logit"), id = pcp, 
-                data = data.frame(y = y, treat = treat, site = site, pcp = pcp),
-                corstr = "exchangeable")
+  fit <- glmer(y ~ treat + site + (1|pcp), family = binomial(link = "logit"), 
+                data = data.frame(y = y, treat = treat, site = site, pcp = pcp))
   
-  cc <- coef(summary(fit))
-  cut <- with(as.data.frame(cc), Estimate[2] + qnorm(0.95)*Std.err[2])
-  test_gee[i] <- as.numeric(cut < (qlogis(p1) - qlogis(p0)))
+  cc <- data.frame(coef(summary(fit)))
+  cut <- with(as.data.frame(cc), Estimate[2] + qnorm(0.95)*Std..Error[2])
+  test_glmm[i] <- as.numeric(abs(cut) < (qlogis(p1) - qlogis(p0)))
   
 }
 
-mean(test_gee) # power
+mean(test_glmm) # power
